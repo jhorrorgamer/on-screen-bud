@@ -7,6 +7,7 @@ SCALE = 4
 GRID = 16
 SIZE = GRID * SCALE
 TRANSPARENT = "#ff00ff"
+FALLBACK_BG = "#10161f"
 
 
 @dataclass
@@ -46,12 +47,14 @@ class DesktopBuddyApp:
         self.root.overrideredirect(True)
         self.root.config(bg=TRANSPARENT)
         self.root.wm_attributes("-topmost", True)
+        self.transparent_supported = False
 
         try:
             self.root.wm_attributes("-transparentcolor", TRANSPARENT)
+            self.transparent_supported = True
         except tk.TclError:
             # Transparent color is not supported on every platform.
-            pass
+            self.root.config(bg=FALLBACK_BG)
 
         self.screen_w = self.root.winfo_screenwidth()
         self.screen_h = self.root.winfo_screenheight()
@@ -64,14 +67,13 @@ class DesktopBuddyApp:
             self.root,
             width=SIZE,
             height=SIZE,
-            bg=TRANSPARENT,
+            bg=TRANSPARENT if self.transparent_supported else FALLBACK_BG,
             highlightthickness=0,
             bd=0,
         )
         self.canvas.pack(fill="both", expand=True)
 
         self.style = self.random_style()
-        self.frame = 0
         self.vx = random.choice([-2, -1, 1, 2])
         self.vy = random.choice([-2, -1, 1, 2])
         self.step_timer = 0
@@ -107,6 +109,16 @@ class DesktopBuddyApp:
 
     def draw_buddy(self, foot_offset: int) -> None:
         self.canvas.delete("all")
+
+        if not self.transparent_supported:
+            self.canvas.create_rectangle(
+                0,
+                0,
+                SIZE,
+                SIZE,
+                fill=FALLBACK_BG,
+                outline=FALLBACK_BG,
+            )
 
         for x in range(5, 11):
             self.px(x, 15, "#000000")
