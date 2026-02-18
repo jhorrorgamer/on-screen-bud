@@ -1,10 +1,15 @@
-"""Entry point for the desktop buddy app.
+"""Stable entrypoint for On-Screen Buddy.
 
-Keeping this file intentionally tiny reduces merge conflicts in PR workflows.
+This file is intentionally tiny so merge operations stay conflict-free.
+All implementation details live in ``buddy_sprite.py``.
 """
 
 from buddy_sprite import DesktopBuddyApp
 
 
-if __name__ == "__main__":
+def main() -> None:
     DesktopBuddyApp().run()
+
+
+if __name__ == "__main__":
+    main()
